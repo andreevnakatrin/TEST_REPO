@@ -1,11 +1,11 @@
-//Проект будет написан на С++, цель проекта: создать макет солнечной систем с вращающимися вокруг солнца планетами
-и ознакомительной информацией о каждой планете для обучения своей сестры и других детей, с которыми я работаю, окружающему миру
+// The project is written in C ++ , the project goal: to create a model of the solar system with the planets revolving around the sun
+and study information about each planet to teach my sister and other children with whom I work , the outside world
 from Scientific.Geometry import Vector
 V1 = Vector(a,b,c) 
 V2 = Vector(e,f,g)
-//здесь мы должны задать числа
+//here we should write numbers
 V1.normal() //норма
-print "V1 - V2:", (V1-V2).length() //длина разности
+print "V1 - V2:", (V1-V2).length() //the difference in length
 V1 + V2
 X = a*a + b*b + c*c
-g= math.sqrt(X) //вычисляем модуль вектора
+g= math.sqrt(X) //vector length
