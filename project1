@@ -1,0 +1,81 @@
+//задаем для планет и спутников начальные координаты (самая левая точка) и начальную скорость, чтобы они двигались по эллипсу, а не по кругу. Предварительно я взяла Меркурий, Венеру, Землю, Луну, Марс, Фобос, Деймос
+#define Gz 800000000
+#define Gm 400000000
+#define PM 46001210
+#define Pv 107476259
+#define Pz 147098074
+#define Pl 15000000
+#define Pm 206620000
+#define Pf 10000000
+#define Pd 15000000
+#define VM 59.5
+#define Vv 36
+#define Vz 30.27
+#define Vl 23
+#define Vm 26.5
+#define Vf 32.5
+#define Vd 32
+#define h 20
+//задаем переменные для координат и скоростей планет и спутников по x и по y
+
+        double  rM, axM, ayM, yM, xM, VxM, VyM,
+                rv, axv, ayv, yv, xv, Vxv, Vyv,
+                rz, axz, ayz, yz, xz, Vxz, Vyz,
+                rm, axm, aym, ym, xm, Vxm, Vym,
+                rls, rlz, axl, ayl, xl, yl, Vxl, Vyl,
+                rlm, axf, ayf, xf, yf, Vxf, Vyf,
+                axd, ayd, xd, yd, Vxd, Vyd,
+                k1, k2, k3, k4;
+        int i=0;
+//присваиваем части переменных значения начальных координат по двум осям и скоростей по двум осям
+        xM = -PM;
+        yM = 0;
+        VxM = 0;
+        VyM = VM;
+
+        xv = -Pv;
+        yv = 0;
+        Vxv = 0;
+        Vyv = Vv;
+
+        xz = -Pz;
+        yz = 0;
+        Vxz = 0;
+        Vyz = Vz;
+
+        xl = -Pz-Pl;
+        yl = 0;
+        Vxl = 0;
+        Vyl = Vl;
+
+        xm = -Pm;
+        ym = 0;
+        Vxm = 0;
+        Vym = Vm;
+
+        xf = -Pm+Pf;
+        yf = 0;
+        Vxf = 0;
+        Vyf = Vf;
+
+        xd = -Pm+Pd;
+        yd = 0;
+        Vxd = 0;
+        Vyd = Vd;
+//расписываем движение Марса путем решения диф.уравнения движения по методу Рунге-Кутта, который определяет каждую дальнейшую координату и скорость планеты/спутника с заданным шагом h (я не уверена, что решение пока правильное)
+
+                rM = xM*xM+yM*yM;
+                axM = -Gs/rM*xM/sqrt(rM);
+                ayM = -Gs/rM*yM/sqrt(rM);
+                k1=h*VxM;
+                k2=h*(VxM+axM*h/2);
+                k3=k2;
+                k4=h*(VxM+axM*h);
+                xM+=(k1+2*k2+2*k3+k4)/6;
+                k1=h*VyM;
+                k2=h*(VyM+ayM*h/2);
+                k3=k2;
+                k4=h*(VyM+ayM*h);
+                yM+=(k1+2*k2+2*k3+k4)/6;
+                VxM+=axM*h;
+                VyM+=ayM*h;
