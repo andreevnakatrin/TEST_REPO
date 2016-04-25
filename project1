@@ -62,8 +62,8 @@
         yd = 0;
         Vxd = 0;
         Vyd = Vd;
-//расписываем движение Марса путем решения диф.уравнения движения по методу Рунге-Кутта, который определяет каждую дальнейшую координату и скорость планеты/спутника с заданным шагом h (я не уверена, что решение пока правильное)
-
+//расписываем движение Меркурия путем решения диф.уравнения движения по методу Рунге-Кутта, который определяет каждую дальнейшую координату и скорость планеты/спутника с заданным шагом h (я не уверена, что решение пока правильное)
+//Меркурий
                 rM = xM*xM+yM*yM;
                 axM = -Gs/rM*xM/sqrt(rM);
                 ayM = -Gs/rM*yM/sqrt(rM);
@@ -79,3 +79,105 @@
                 yM+=(k1+2*k2+2*k3+k4)/6;
                 VxM+=axM*h;
                 VyM+=ayM*h;
+//расписываем аналогичным образом движения всех указанных выше планет и спутников
+
+ //Венера
+                rv = xv*xv+yv*yv;
+                axv = -Gs/rv*xv/sqrt(rv);
+                ayv = -Gs/rv*yv/sqrt(rv);
+                k1=h*Vxv;
+                k2=h*(Vxv+axv*h/2);
+                k3=k2;
+                k4=h*(Vxv+axv*h);
+                xv+=(k1+2*k2+2*k3+k4)/6;
+                k1=h*Vyv;
+                k2=h*(Vyv+ayv*h/2);
+                k3=k2;
+                k4=h*(Vyv+ayv*h);
+                yv+=(k1+2*k2+2*k3+k4)/6;
+                Vxv+=axv*h;
+                Vyv+=ayv*h;
+                //Земля
+                rz = xz*xz+yz*yz;
+                axz = -Gs/rz*xz/sqrt(rz);
+                ayz = -Gs/rz*yz/sqrt(rz);
+                k1=h*Vxz;
+                k2=h*(Vxz+axz*h/2);
+                k3=k2;
+                k4=h*(Vxz+axz*h);
+                xz+=(k1+2*k2+2*k3+k4)/6;
+                k1=h*Vyz;
+                k2=h*(Vyz+ayz*h/2);
+                k3=k2;
+                k4=h*(Vyz+ayz*h);
+                yz+=(k1+2*k2+2*k3+k4)/6;
+                Vxz+=axz*h;
+                Vyz+=ayz*h;
+                //Луна
+                rls = xl*xl+yl*yl;
+                rlz = (xz-xl)*(xz-xl)+(yz-yl)*(yz-yl);
+                axl = -Gs/rls*xl/sqrt(rls) -Gz/rlz*(xl-xz)/sqrt(rlz);
+                ayl = -Gs/rls*yl/sqrt(rls) -Gz/rlz*(yl-yz)/sqrt(rlz);
+                k1=Vxl;
+                k2=(Vxl+axl*h/2);
+                k3=k2;
+                k4=(Vxl+axl*h);
+                xl+=h*(k1+2*k2+2*k3+k4)/6;
+                k1=Vyl;
+                k2=(Vyl+ayl*h/2);
+                k3=k2;
+                k4=(Vyl+ayl*h);
+                yl+=h*(k1+2*k2+2*k3+k4)/6;
+                Vxl+=axl*h;
+                Vyl+=ayl*h;
+                //Марс
+                rm = xm*xm+ym*ym;
+                axm = -Gs/rm*xm/sqrt(rm);
+                aym = -Gs/rm*ym/sqrt(rm);
+                k1=h*Vxm;
+                k2=h*(Vxm+axm*h/2);
+                k3=k2;
+                k4=h*(Vxm+axm*h);
+                xm+=(k1+2*k2+2*k3+k4)/6;
+                k1=h*Vym;
+                k2=h*(Vym+aym*h/2);
+                k3=k2;
+                k4=h*(Vym+aym*h);
+                ym+=(k1+2*k2+2*k3+k4)/6;
+                Vxm+=axm*h;
+                Vym+=aym*h;
+                //Фобос
+                rls = xf*xf+yf*yf;
+                rlm = (xm-xf)*(xm-xf)+(ym-yf)*(ym-yf);
+                axf = -Gs/rls*xf/sqrt(rls) -Gm/rlm*(xf-xm)/sqrt(rlm);
+                ayf = -Gs/rls*yf/sqrt(rls) -Gm/rlm*(yf-ym)/sqrt(rlm);
+                k1=Vxf;
+                k2=(Vxf+axf*h/2);
+                k3=k2;
+                k4=(Vxf+axf*h);
+                xf+=h*(k1+2*k2+2*k3+k4)/6;
+                k1=Vyf;
+                k2=(Vyf+ayf*h/2);
+                k3=k2;
+                k4=(Vyf+ayf*h);
+                yf+=h*(k1+2*k2+2*k3+k4)/6;
+                Vxf+=axf*h;
+                Vyf+=ayf*h;
+                //Деймос
+                rls = xd*xd+yd*yd;
+                rlm = (xm-xd)*(xm-xd)+(ym-yd)*(ym-yd);
+                axd = -Gs/rls*xd/sqrt(rls) -Gm/rlm*(xd-xm)/sqrt(rlm);
+                ayd = -Gs/rls*yd/sqrt(rls) -Gm/rlm*(yd-ym)/sqrt(rlm);
+                k1=Vxd;
+                k2=(Vxd+axd*h/2);
+                k3=k2;
+                k4=(Vxd+axd*h);
+                xd+=h*(k1+2*k2+2*k3+k4)/6;
+                k1=Vyd;
+                k2=(Vyd+ayd*h/2);
+                k3=k2;
+                k4=(Vyd+ayd*h);
+                yd+=h*(k1+2*k2+2*k3+k4)/6;
+                Vxd+=axd*h;
+                Vyd+=ayd*h;
+                
