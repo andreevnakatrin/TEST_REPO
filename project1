@@ -1,4 +1,5 @@
 //задаем для планет и спутников начальные координаты (самая левая точка) и начальную скорость, чтобы они двигались по эллипсу, а не по кругу. Предварительно я взяла Меркурий, Венеру, Землю, Луну, Марс, Фобос, Деймос
+#define Gs 132736162900
 #define Gz 800000000
 #define Gm 400000000
 #define PM 46001210
@@ -8,6 +9,11 @@
 #define Pm 206620000
 #define Pf 10000000
 #define Pd 15000000
+#define Py 740679835
+#define Ps 1349823615
+#define Pyr 2734998229
+#define Pn 4459753056
+#define Pp 4438120000
 #define VM 59.5
 #define Vv 36
 #define Vz 30.27
@@ -15,18 +21,31 @@
 #define Vm 26.5
 #define Vf 32.5
 #define Vd 32
+#define Vy 13.72
+#define Vs 10.18
+#define Vyr 7.11
+#define Vn 5.50
+#define Vp 6.10 
 #define h 20
+
 //задаем переменные для координат и скоростей планет и спутников по x и по y
 
-        double  rM, axM, ayM, yM, xM, VxM, VyM,
+    double  rM, axM, ayM, yM, xM, VxM, VyM,
                 rv, axv, ayv, yv, xv, Vxv, Vyv,
                 rz, axz, ayz, yz, xz, Vxz, Vyz,
                 rm, axm, aym, ym, xm, Vxm, Vym,
                 rls, rlz, axl, ayl, xl, yl, Vxl, Vyl,
                 rlm, axf, ayf, xf, yf, Vxf, Vyf,
                 axd, ayd, xd, yd, Vxd, Vyd,
-                k1, k2, k3, k4;
+ry, axy, ayy, yy, xy, Vxy, Vyy,
+rs, axs, ays, ys, xs, Vxs, Vys,
+rs, axs, ays, ys, xs, Vxs, Vys,
+ryr, axyr, ayyr, yyr, xyr, Vxyr, Vyyr,
+rn, axn, ayn, yn, xn, Vxn, Vyn,
+rp, axp, ayp, yp, xp, Vxp, Vyp
+           k1, k2, k3, k4;
         int i=0;
+
 //присваиваем части переменных значения начальных координат по двум осям и скоростей по двум осям
         xM = -PM;
         yM = 0;
@@ -62,6 +81,32 @@
         yd = 0;
         Vxd = 0;
         Vyd = Vd;
+
+        xy = -Py;
+        yy = 0;
+        Vxy = 0;
+        Vyy = Vy;
+
+        xs = -Ps;
+        ys = 0;
+        Vxs = 0;
+        Vys = Vs;
+
+        xyr = -Pyr;
+        yyr = 0;
+        Vxyr = 0;
+        Vyyr = Vyr;
+
+        xn = -Pn;
+        yn = 0;
+        Vxn = 0;
+        Vyn = Vn;
+
+        xp = -Pp;
+        yp = 0;
+        Vxp = 0;
+        Vyp = Vp;
+
 //расписываем движение Меркурия путем решения диф.уравнения движения по методу Рунге-Кутта, который определяет каждую дальнейшую координату и скорость планеты/спутника с заданным шагом h (я не уверена, что решение пока правильное)
 //Меркурий
                 rM = xM*xM+yM*yM;
@@ -180,4 +225,84 @@
                 yd+=h*(k1+2*k2+2*k3+k4)/6;
                 Vxd+=axd*h;
                 Vyd+=ayd*h;
-                
+//Юпитер                
+                                ry = xy*xy+yy*yy;
+                axy = -Gs/ry*xy/sqrt(ry);
+                ayy = -Gs/ry*yy/sqrt(ry);
+                k1=h*Vxy;
+                k2=h*(Vxy+axy*h/2);
+                k3=k2;
+                k4=h*(Vxy+axy*h);
+                xy+=(k1+2*k2+2*k3+k4)/6;
+                k1=h*Vyy;
+                k2=h*(Vyy+ayy*h/2);
+                k3=k2;
+                k4=h*(Vyy+ayy*h);
+                yy+=(k1+2*k2+2*k3+k4)/6;
+                Vxy+=axy*h;
+                Vyy+=ayy*h;
+//Сатурн
+                rs = xs*xs+ys*ys;
+                axs = -Gs/rs*xs/sqrt(rs);
+                ays = -Gs/rs*ys/sqrt(rs);
+                k1=h*Vxs;
+                k2=h*(Vxs+axs*h/2);
+                k3=k2;
+                k4=h*(Vxs+axs*h);
+                xs+=(k1+2*k2+2*k3+k4)/6;
+                k1=h*Vys;
+                k2=h*(Vys+ays*h/2);
+                k3=k2;
+                k4=h*(Vys+ays*h);
+                ys+=(k1+2*k2+2*k3+k4)/6;
+                Vxs+=axs*h;
+                Vys+=ays*h;
+//Уран
+                ryr = xyr*xyr+yyr*yyr;
+                axyr = -Gs/ryr*xyr/sqrt(ryr);
+                ayyr = -Gs/ryr*yyr/sqrt(ryr);
+                k1=h*Vxyr;
+                k2=h*(Vxyr+axyr*h/2);
+                k3=k2;
+                k4=h*(Vxyr+axyr*h);
+                xyr+=(k1+2*k2+2*k3+k4)/6;
+                k1=h*Vyyr;
+                k2=h*(Vyyr+ayyr*h/2);
+                k3=k2;
+                k4=h*(Vyyr+ayyr*h);
+                yyr+=(k1+2*k2+2*k3+k4)/6;
+                Vxyr+=axyr*h;
+                Vyyr+=ayyr*h;
+//Нептун
+                rn = xn*xn+yn*yn;
+                axn = -Gs/rn*xn/sqrt(rn);
+                ayn = -Gs/rn*yn/sqrt(rn);
+                k1=h*Vxn;
+                k2=h*(Vxn+axn*h/2);
+                k3=k2;
+                k4=h*(Vxn+axn*h);
+                xn+=(k1+2*k2+2*k3+k4)/6;
+                k1=h*Vyn;
+                k2=h*(Vyn+ayn*h/2);
+                k3=k2;
+                k4=h*(Vyn+ayn*h);
+                yn+=(k1+2*k2+2*k3+k4)/6;
+                Vxn+=axn*h;
+                Vyn+=ayn*h;
+//Плутон
+                rp = xp*xp+yp*yp;
+                axp = -Gs/rp*xp/sqrt(rp);
+                ayp = -Gs/rp*yp/sqrt(rp);
+                k1=h*Vxp;
+                k2=h*(Vxp+axp*h/2);
+                k3=k2;
+                k4=h*(Vxp+axp*h);
+                xp+=(k1+2*k2+2*k3+k4)/6;
+                k1=h*Vyp;
+                k2=h*(Vyp+ayp*h/2);
+                k3=k2;
+                k4=h*(Vyp+ayp*h);
+                yp+=(k1+2*k2+2*k3+k4)/6;
+                Vxp+=axp*h;
+                Vyp+=ayp*h;
+
