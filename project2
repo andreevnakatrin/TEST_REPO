@@ -1,0 +1,182 @@
+//Код для всех планет теперь выглядит так
+CelestialObject::CelestialObject(UnicodeString bmpImage, double x, double y, double vx, double vy, int size, UnicodeString descr)
+{
+	this->image = new Graphics::TBitmap;
+	this->image->LoadFromFile(bmpImage);
+	this->image->Transparent = true;
+	this->image->TransparentMode = tmFixed;
+	this->image->TransparentColor = clBlack;
+
+	this->X = x;
+	this->Y = y;
+	this->vX = vx;
+	this->vY = vy;
+	this->size = size;
+
+	this->description = descr;
+}
+
+void CelestialObject::Update()
+{
+	static const double g = 132736162900, h = 20.0;
+	double R, aX, aY, k1, k2, k3, k4;
+
+	for (int i = 0; i < 5000; ++i) {
+		R = X*X+Y*Y;
+
+		aX  = -g/R*X/sqrt(R);
+		k1  = h*vX;
+		k2  = h*(vX+aX*h/2);
+		k3  = k2;
+		k4  = h*(vX+aX*h);
+		this->X  += (k1+2*k2+2*k3+k4)/6;
+		this->vX += aX*h;
+
+		aY  = -g/R*Y/sqrt(R);
+		k1  = h*vY;
+		k2  = h*(vY+aY*h/2);
+		k3  = k2;
+		k4  = h*(vY+aY*h);
+		this->Y  += (k1+2*k2+2*k3+k4)/6;
+		this->vY += aY*h;
+	}
+	//Теперь все координаты забиваем вместе с рисунками планет
+		objectsCount = 10;
+	objects = new CelestialObject *[objectsCount];
+
+	objects[0] = new CelestialObject("images/sun.bmp", 0, 1, 0, 0, 10, "Солнце");
+	objects[1] = new CelestialObject("images/earth.bmp", -147098074, 0, 0, 30.27, 3, "Земля");
+	objects[2] = new CelestialObject("", -46001210, 0, 0, 59.5, 2, "Меркурий");
+	objects[3] = new CelestialObject("", -107476259, 0, 0, 36, 3, "Венера");
+	objects[4] = new CelestialObject("", -206620000, 0, 0, 26.5, 2, "Марс");
+	objects[5] = new CelestialObject("", -740679835, 0, 0, 13.72, 5, "Юпитер");
+	objects[6] = new CelestialObject("", -1349823615, 0, 0, 10.18, 5, "Сатурн");
+	objects[7] = new CelestialObject("", -2734998229, 0, 0, 7.11, 4, "Уран");
+	objects[8] = new CelestialObject("", -4459753056, 0, 0, 5.50, 4, "Нептун");
+	objects[9] = new CelestialObject("", -4438120000, 0, 0, 6.10 , 1, "Плутон");
+
+	//Также я сделала камеру
+	Camera::Camera(TCanvas *c, UnicodeString bmpImage)
+{
+	this->canvas = c;
+
+	this->background = new Graphics::TBitmap;
+	this->background->LoadFromFile(bmpImage);
+	this->bckgrW = this->background->Width;
+	this->bckgrH = this->background->Height;
+
+	if ( this->bckgrW < this->bckgrH ) {
+		this->smallest = this->bckgrW;
+	}
+	else {
+        this->smallest = this->bckgrH;
+    }
+
+	// устанавливаем камеру в центр изображения
+	this->cameraX = this->bckgrW/2;
+	this->cameraY = this->bckgrH/2;
+
+	// начальный масштаб 500х500 (под размеры панели)
+	this->cameraScale = 500;
+}
+
+void Camera::GetSize(int &w, int &h)
+{
+	w = this->bckgrW;
+	h = this->bckgrH;
+}
+
+void Camera::SetPosition(int x, int y)
+{
+	this->cameraX = x;
+	this->cameraY = y;
+	this->AdjustPosition();
+}
+
+void Camera::GetPosition(int &x, int &y)
+{
+	x = this->cameraX;
+	y = this->cameraY;
+}
+
+int Camera::GetScale()
+{
+	return this->cameraScale;
+}
+
+void Camera::SetScale(int scale)
+{
+	if (scale > this->background->Width) {
+		scale = this->background->Width;
+	}
+
+	if (scale > this->background->Height) {
+		scale = this->background->Height;
+	}
+
+	// максимальное приближение
+	if (scale < 300) {
+		scale = 300;
+	}
+
+	this->cameraScale = scale;
+	this->AdjustPosition();
+}
+
+void Camera::AdjustPosition()
+{
+	if (this->cameraX+this->cameraScale/2 > this->background->Width) {
+		this->cameraX = this->background->Width - this->cameraScale/2;
+	}
+	else if (this->cameraX-this->cameraScale/2 < 0) {
+		this->cameraX = this->cameraScale/2;
+	}
+
+	if (this->cameraY+this->cameraScale/2 > this->background->Height) {
+		this->cameraY = this->background->Height - this->cameraScale/2;
+	}
+	else if (this->cameraY-this->cameraScale/2 < 0) {
+		this->cameraY = this->cameraScale/2;
+	}
+}
+
+#define FORM_RECT(x, y, s) TRect(x-s, y-s, x+s, y+s)
+void Camera::Render(CelestialObject **objects, int objectsCount)
+{
+	// размеры панели
+	static const int size = 580;
+    // область панели
+	static const TRect surface(0, 0, size, size);
+
+	// рисуем фон
+	this->canvas->CopyRect(surface, this->background->Canvas,
+		FORM_RECT(this->cameraX, this->cameraY, this->cameraScale/2));
+
+	// рисуем объекты
+	int localX, localY;
+	for (int i = 0; i < objectsCount; ++i) {
+		objects[i]->GetPosition(localX, localY);
+		//ShowMessage(String(localX) + " " + String(localY));
+		// смещаем, т.к. центр координат в середине рисунка
+		localX += this->bckgrW/2;
+		localY += this->bckgrH/2;
+
+		//ShowMessage(String(this->cameraX) + "\n" +
+		//	String(this->cameraX-this->cameraScale/2) + " < " + String(localX) + " < " + String(this->cameraX+this->cameraScale/2) + "\n" +
+		//	String(this->cameraY-this->cameraScale/2) + " < " + String(localY) + " < " + String(this->cameraY+this->cameraScale/2));
+
+		if (localX > this->cameraX-this->cameraScale/2 && localX < this->cameraX+this->cameraScale/2 &&
+			localY > this->cameraY-this->cameraScale/2 && localY < this->cameraY+this->cameraScale/2) {
+			//ShowMessage(objects[i]->GetDescription());
+
+			// x = 580*(1440-(1440-25))/500;
+			int X = size*((localX-(this->cameraX-this->cameraScale/2.0))/this->cameraScale),
+				Y = size*((localY-(this->cameraY-this->cameraScale/2.0))/this->cameraScale);
+
+			//ShowMessage(X);
+
+			int r = objects[i]->GetSize()*(this->GetSmallestSize())/this->cameraScale;
+			this->canvas->StretchDraw(TRect(X-r, Y-r, X+r, Y+r), objects[i]->GetImage());
+		}
+	}
+}
